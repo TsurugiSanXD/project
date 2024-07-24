@@ -1,0 +1,2 @@
+1) ¿Que es un sistema de control de versiones?
+R\: Es un sofware que ayuda a evitar la necesidad de guardar los archivos con nombres diferentes a medida que se realizan cambios en el archivo
