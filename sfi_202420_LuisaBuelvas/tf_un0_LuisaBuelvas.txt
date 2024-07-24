@@ -14,3 +14,6 @@ R\: * Git es una herramienta usada para el control de veriones de manera local, 
   R\: Área de trabajo: El área de trabajo es el directorio de tu sistema de archivos local donde trabajamos y contiene los archivos del proyecto.
       Área de preparación: La área de preparación es un espacio intermedio entre el área de trabajo y el repositorio Git. Nos permite seleccionar qué cambios específicos (archivos modificados) deseamos incluir en nuestra próxima confirmación (commit) al repositorio.
       Directorio git:  es donde Git almacena la metadata y la base de datos de objetos de tu proyecto. Esta es la parte central de Git donde se guarda todo el historial de versiones y la información sobre los cambios realizados en los archivos.
+
+5)¿Para que se utilizan las ramas en Git?
+R\: En git utilizamos las ramas para guardas diferentes versiones de un archivo.
