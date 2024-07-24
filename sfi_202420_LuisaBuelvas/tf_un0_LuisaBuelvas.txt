@@ -1,2 +1,6 @@
 1) ¿Que es un sistema de control de versiones?
 R\: Es un sofware que ayuda a evitar la necesidad de guardar los archivos con nombres diferentes a medida que se realizan cambios en el archivo
+
+2)¿Que diferencia hay entre un repositorio local y remoto?
+R\: Que el retorio local se encuentra en el computador, mientras que el remoto se encuetra en el internet.
+
