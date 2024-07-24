@@ -4,3 +4,8 @@ R\: Es un sofware que ayuda a evitar la necesidad de guardar los archivos con no
 2)¿Que diferencia hay entre un repositorio local y remoto?
 R\: Que el retorio local se encuentra en el computador, mientras que el remoto se encuetra en el internet.
 
+3)Mencione tres diferencias entre Git y GitHub.
+R\: * Git es una herramienta usada para el control de veriones de manera local, mientras que GitHub por otro lado es una herramienta para la colaboración y el alojamiento remoto.
+    * Git se utiliza a traves de linea de comandos, mientras que GitHub proporciona una interfaz web que facilita la visualización y gestión de repositorios Git alojados en su plataforma.
+    * Git es un sistema de control de versiones distribuido y GitHub es una plataforma de alojamiento para repositorios Git.
+    
