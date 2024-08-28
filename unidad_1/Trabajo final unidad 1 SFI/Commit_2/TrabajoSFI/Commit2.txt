@@ -1,0 +1,1 @@
+"Se añadieron también las funciones de bajar el tiempo al pulsar la tecla B y la de empezar la cuenta regresa con la tecla L, también se prestableció el código para terminar el programa que es 'C1234'"
