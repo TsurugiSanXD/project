@@ -1,0 +1,16 @@
+## Ejercicio 1
+```
+void setup() {
+  Serial.begin(115200);
+}
+
+void loop() {
+if(Serial.available()){
+if(Serial.read() == '1'){
+      Serial.print("Hello from Raspberry Pi Pico");
+    }
+  }
+}
+```
+Prueba la aplicación con ScriptCommunicator. ¿Cómo funciona?
+R\: Basicamente lo que hace el codigo es que si se escribe por consola el número 1 va a parecer en la pantalla el mensaje "Hello from Raspberry Pi Pico"
