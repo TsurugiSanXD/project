@@ -66,4 +66,178 @@ R\: PortName es quien indica el nombre del puerto, asegura que esten disponibles
 
 ## Ejercicio 2
 
+A continuación, debes adicionar a la aplicación un elemento de GUI tipo *Text - TextMeshPro* y luego, arrastrar una referencia a este elemento a *myText* (si no sabes cómo hacerlo llama al profe).
 
+Y la aplicación del controlador:
+
+```
+void setup()
+{
+		Serial.begin(115200);
+}
+
+void loop()
+{
+		if(Serial.available())
+		{
+				if(Serial.read() == '1')
+				{
+			      delay(3000);
+			      Serial.print("Hello from Raspi");
+				}
+		}
+}
+```
+
+Ejecuta la aplicación en Unity. Verás un número cambiar rápidamente en pantalla. Ahora presiona la tecla A (no olvides dar click en la pantalla *Game*). ¿Qué pasa? ¿Por qué crees que ocurra esto?
+R\: Lo que ocurre cuando se oprimer la tecla A se inicia un contador el cual no tiene fin. Ocurre dado que a diferencia del codigo anterior aqui no le colocamos un medio para que pare o un maximo de tiempo que le indique cuando parar. 
+
+## Ejercico 3
+
+Realiza el siguiente experimento. Programa ambos códigos y analiza su funcionamiento.
+
+```
+void task()
+{
+		enum class TaskStates
+		{
+				INIT,
+				WAIT_INIT,
+				SEND_EVENT
+		};
+		static TaskStates taskState = TaskStates::INIT;
+		static uint32_t previous = 0;
+		static u_int32_t counter = 0;
+
+		switch (taskState)
+		{
+				case TaskStates::INIT:
+				{
+						Serial.begin(115200);
+						taskState = TaskStates::WAIT_INIT;
+						break;
+				}
+				case TaskStates::WAIT_INIT:
+				{
+						if (Serial.available() > 0)
+						{
+								if (Serial.read() == '1')
+								{
+										previous = 0; // Force to send the first value immediately
+										taskState = TaskStates::SEND_EVENT;
+								}
+						}
+						break;
+				}
+				case TaskStates::SEND_EVENT:
+				{
+						uint32_t current = millis();
+						if ((current - previous) > 2000)
+						{
+								previous = current;
+								Serial.print(counter);
+								counter++;
+						}
+						if (Serial.available() > 0)
+						{
+							  if (Serial.read() == '2')
+							  {
+								    taskState = TaskStates::WAIT_INIT;
+							  }
+						}
+						break;
+				}
+				default:
+				{
+						break;
+				}
+		}
+}
+```
+
+void setup()
+{
+		task();
+}
+
+void loop()
+{
+		task();
+}
+```
+
+```
+using UnityEngine;
+using System.IO.Ports;
+using TMPro;
+
+enum TaskState
+{
+    INIT,
+    WAIT_START,
+    WAIT_EVENTS
+}
+
+public class Serial : MonoBehaviour
+{
+		private static TaskState taskState = TaskState.INIT;
+		private SerialPort _serialPort;
+		private byte[] buffer;
+		public TextMeshProUGUI myText;
+		private int counter = 0;
+
+		void Start()
+    {
+        _serialPort =new SerialPort();
+        _serialPort.PortName = "COM3";
+        _serialPort.BaudRate = 115200;
+        _serialPort.DtrEnable =true;
+        _serialPort.Open();
+        Debug.Log("Open Serial Port");
+        buffer =new byte[128];
+    }
+
+void Update()
+    {
+        myText.text = counter.ToString();
+        counter++;
+
+				switch (taskState)
+        {
+						case TaskState.INIT:
+		            taskState = TaskState.WAIT_START;
+                Debug.Log("WAIT START");
+								break;
+						case TaskState.WAIT_START:
+								if (Input.GetKeyDown(KeyCode.A))
+                {
+                    byte[] data = {0x31};// start
+                    _serialPort.Write(data,0,1);
+                    Debug.Log("WAIT EVENTS");
+                    taskState = TaskState.WAIT_EVENTS;
+                }
+								break;
+						case TaskState.WAIT_EVENTS:
+								if (Input.GetKeyDown(KeyCode.B))
+                {
+                    byte[] data = {0x32};// stop
+                    _serialPort.Write(data,0,1);
+                    Debug.Log("WAIT START");
+                    taskState = TaskState.WAIT_START;
+                }
+								if (_serialPort.BytesToRead > 0)
+                {
+                    int numData = _serialPort.Read(buffer, 0, 128);
+                    Debug.Log(System.Text.Encoding.ASCII.GetString(buffer));
+                }
+								break;
+						default:
+                Debug.Log("State Error");
+								break;
+        }
+    }
+}
+```
+
+¿Recuerdas las preguntas presentadas en el experimento anterior? ¿Aquí nos pasa lo mismo?
+R\: Con respecto al primer codigo, este es casi igual al de el punto anterior, con la diferencia que cambia la rapidez con la que se ejecuta el contador. Por otro lado, el segundo codigo si funciona y basicamente cumple la función de leer los bites hasta el maximo indicado en el codigo, en este caso el maximo de bites es 20 por lo tanto esa es la capacidad de de lectura que tiene el buffer, en tal caso que haya menos hara la cuenta hasta la cantidad que hay o se puede modificar para que solo cuente hasta esa cantidad.
