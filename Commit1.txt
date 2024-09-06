@@ -1,0 +1,1 @@
+"Se configuran los estados iniciales del programa, también se acomoda el config para probar el evento de subir el tiempo un segundo cada que se pulsa la tecla S"
