@@ -12,5 +12,58 @@ if(Serial.read() == '1'){
   }
 }
 ```
+
 Prueba la aplicación con ScriptCommunicator. ¿Cómo funciona?
 R\: Basicamente lo que hace el codigo es que si se escribe por consola el número 1 va a parecer en la pantalla el mensaje "Hello from Raspberry Pi Pico"
+
+Crea un nuevo C# Script y un Game Object. Añade el Script al GameObject. Ve al menu Assets y luego selecciona Open C# Project.
+
+```
+using UnityEngine;
+using System.IO.Ports;
+public class Serial : MonoBehaviour
+{
+private SerialPort _serialPort =new SerialPort();
+private byte[] buffer =new byte[32];
+
+void Start()
+    {
+        _serialPort.PortName = "COM3";
+        _serialPort.BaudRate = 115200;
+        _serialPort.DtrEnable =true;
+        _serialPort.Open();
+        Debug.Log("Open Serial Port");
+    }
+
+void Update()
+    {
+
+				if (Input.GetKeyDown(KeyCode.A))
+        {
+            byte[] data = {0x31};// or byte[] data = {'1'};            
+						_serialPort.Write(data,0,1);
+            Debug.Log("Send Data");
+        }
+
+				if (Input.GetKeyDown(KeyCode.B))
+        {
+						if (_serialPort.BytesToRead >= 16)
+            {
+                _serialPort.Read(buffer, 0, 20);
+                Debug.Log("Receive Data");
+                Debug.Log(System.Text.Encoding.ASCII.GetString(buffer));
+            }
+        }
+
+    }
+}
+```
+1) ¿Por qué es importante considerar las propiedades PortName y BaudRate?
+R?: El PortName es importante porque es la función que utilizamos para asignar el puerto que vamos a usar (le decimos cual es el nombre del puerto en el que esta el controlador) y BaudRate es importante dado que cumple el mismo papel que el serial.begin, osea que es quien indica la rapidez con la que se va a leer el codigo.
+
+2) ¿Qué relación tienen las propiedades anteriores con el controlador?
+R\: PortName es quien indica el nombre del puerto, asegura que esten disponibles y bien asignados a los dispositivos conectados. El BaudRate es quien gestiona la velocidad de transmisión de datos entre el ordenador y el dispositivo.
+
+## Ejercicio 2
+
+
