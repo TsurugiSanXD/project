@@ -67,7 +67,7 @@ Analiza:
 
 - ¿Qué relación tienen las propiedades anteriores con el controlador?
 
-**R\:**Como se enciono anteriormente PortName sirve para indicar en que puesto se encuentra conectado el controlador y BaudRate es quien indica la velocidad quen tendra la transmisión de datos entre el controlador y el computador.
+**R\:** Como se enciono anteriormente PortName sirve para indicar en que puesto se encuentra conectado el controlador y BaudRate es quien indica la velocidad quen tendra la transmisión de datos entre el controlador y el computador.
 
 ## Ejercicio 2
 
