@@ -194,3 +194,163 @@ Por ejemplo, ¿Qué pasaría si al momento de ejecutar la instrucción `int num
 _serialPort.Read(buffer, 0, 20);` solo han llegado 10 de los 16 bytes del mensaje? ¿Cómo puede hacer tu programa para saber que ya tiene el mensaje completo? ¿Cómo se podría garantizar que antes de hacer la operación Read tenga los 16 bytes listos para ser leídos? Además, si los mensajes que envía el controlador tienen tamaños diferentes, ¿Cómo haces para saber que el mensaje enviado está completo o faltan bytes por recibir?
 
 **R\:** El codigo si funciona, este basicamente va haciendo un conteo de los bytes que hay en el momento hasta llegar a 20. Cuando el sistema no llega a los 20 bytes lo que hace es contar hasta el número que haya, si hay 916 bytes cuenta hasta 16 bytes, si hay más contara más y si hay menos contara menos. En cuanto al buffer eso depende de como se programe se puede decidir que comience en 0 o 10 y que termine hasta en 50, depende de quien lo programe.
+
+## Ejercicio 3
+
+Nótese que en los dos ejercicios anteriores, el PC primero le pregunta al controlador por datos (le manda un 1). ¿Y si el PC no pregunta?
+
+**R\:** Si no se le pregunta al PC no sucedera nada, dado que se necesita que el PC indique la instrucción para que se ejecute la función.
+
+Realiza el siguiente experimento. Programa ambos códigos y analiza su funcionamiento.
+
+```cpp
+void task()
+{
+		enum class TaskStates
+		{
+				INIT,
+				WAIT_INIT,
+				SEND_EVENT
+		};
+		static TaskStates taskState = TaskStates::INIT;
+		static uint32_t previous = 0;
+		static u_int32_t counter = 0;
+
+		switch (taskState)
+		{
+				case TaskStates::INIT:
+				{
+						Serial.begin(115200);
+						taskState = TaskStates::WAIT_INIT;
+						break;
+				}
+				case TaskStates::WAIT_INIT:
+				{
+						if (Serial.available() > 0)
+						{
+								if (Serial.read() == '1')
+								{
+										previous = 0; // Force to send the first value immediately
+										taskState = TaskStates::SEND_EVENT;
+								}
+						}
+						break;
+				}
+				case TaskStates::SEND_EVENT:
+				{
+						uint32_t current = millis();
+						if ((current - previous) > 2000)
+						{
+								previous = current;
+								Serial.print(counter);
+								counter++;
+						}
+						if (Serial.available() > 0)
+						{
+							  if (Serial.read() == '2')
+							  {
+								    taskState = TaskStates::WAIT_INIT;
+							  }
+						}
+						break;
+				}
+				default:
+				{
+						break;
+				}
+		}
+}
+
+void setup()
+{
+		task();
+}
+
+void loop()
+{
+		task();
+}
+```
+
+```csharp
+using UnityEngine;
+using System.IO.Ports;
+using TMPro;
+
+enum TaskState
+{
+    INIT,
+    WAIT_START,
+    WAIT_EVENTS
+}
+
+public class Serial : MonoBehaviour
+{
+		private static TaskState taskState = TaskState.INIT;
+		private SerialPort _serialPort;
+		private byte[] buffer;
+		public TextMeshProUGUI myText;
+		private int counter = 0;
+
+		void Start()
+    {
+        _serialPort =new SerialPort();
+        _serialPort.PortName = "COM3";
+        _serialPort.BaudRate = 115200;
+        _serialPort.DtrEnable =true;
+        _serialPort.Open();
+        Debug.Log("Open Serial Port");
+        buffer =new byte[128];
+    }
+
+void Update()
+    {
+        myText.text = counter.ToString();
+        counter++;
+
+				switch (taskState)
+        {
+						case TaskState.INIT:
+		            taskState = TaskState.WAIT_START;
+                Debug.Log("WAIT START");
+								break;
+						case TaskState.WAIT_START:
+								if (Input.GetKeyDown(KeyCode.A))
+                {
+                    byte[] data = {0x31};// start
+                    _serialPort.Write(data,0,1);
+                    Debug.Log("WAIT EVENTS");
+                    taskState = TaskState.WAIT_EVENTS;
+                }
+								break;
+						case TaskState.WAIT_EVENTS:
+								if (Input.GetKeyDown(KeyCode.B))
+                {
+                    byte[] data = {0x32};// stop
+                    _serialPort.Write(data,0,1);
+                    Debug.Log("WAIT START");
+                    taskState = TaskState.WAIT_START;
+                }
+								if (_serialPort.BytesToRead > 0)
+                {
+                    int numData = _serialPort.Read(buffer, 0, 128);
+                    Debug.Log(System.Text.Encoding.ASCII.GetString(buffer));
+                }
+								break;
+						default:
+                Debug.Log("State Error");
+								break;
+        }
+    }
+}
+```
+
+¿Recuerdas las preguntas presentadas en el experimento anterior? ¿Aquí nos pasa lo mismo?
+
+Analicemos el asunto. Cuando preguntas `_serialPort.BytesToRead > 0` lo que puedes asegurar es que al MENOS tienes un byte del mensaje, pero no puedes saber si tienes todos los bytes que lo componen. Una idea para resolver esto, sería hacer que todos los mensajes tengan el mismo tamaño. De esta manera solo tendrías que preguntar `_serialPort.BytesToRead > SIZE`, donde SIZE sería el tamaño fijo; sin embargo, esto le resta flexibilidad al protocolo de comunicación. Nota que esto mismo ocurre en el caso del programa del controlador con `Serial.available() > 0`. ¿Cómo podrías solucionar este problema?
+
+**R\:**  una manera de solucionar el problema seria restringiendo el tamaño del mensaje para que este dentro de un rango determinado de bytes, por ejemplo, escribir _serialPort.BytesToRead > minV && _serialPort.BytesToRead < maxV donde minV y maxV serian los valores que determinen el rango del tamaño de los mensajes, para que esten dentro de un rango o incluso un unico valor en especifico.
+
+## Ejercicio 4
+
+
