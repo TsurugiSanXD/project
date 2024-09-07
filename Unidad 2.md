@@ -61,8 +61,36 @@ void Update()
 Analiza:
 
 - ¿Por qué es importante considerar las propiedades *PortName* y *BaudRate*?
-R\: Son importantes dado que PortName es la función que le da el nombre al puerto, en otras palabras es la función que le indica al programa que puerto es el que se va a usar.Por otro lado, BaudRate basicamente cumple la función de leer los bites hasta el maximo indicado en el codigo, en este caso el maximo de bites es 20 por lo tanto esa es la capacidad de de lectura que tiene el buffer, e  tal caso que haya menos hara la cuenta hasta la cantidad que hay o se puede modificar para que solo cuente hasta esa cantidad.
+R\: Son importantes dado que PortName es la función que le da el nombre al puerto, en otras palabras es la función que le indica al programa que puerto es el que se va a usar.Por otro lado, BaudRate basicamente cumple la función de indicar la velocidad con la que se va a hacer la trsnamisión de datos
 
 - ¿Qué relación tienen las propiedades anteriores con el controlador?
 R\:Como se enciono anteriormente PortName sirve para indicar en que puesto se encuentra conectado el controlador y BaudRate es quien indica la velocidad quen tendra la transmisión de datos entre el controlador y el computador.
+
+## Ejercicio 2
+
+A continuación, debes adicionar a la aplicación un elemento de GUI tipo *Text - TextMeshPro* y luego, arrastrar una referencia a este elemento a *myText* (si no sabes cómo hacerlo llama al profe).
+
+Y la aplicación del controlador:
+
+```cpp
+void setup()
+{
+		Serial.begin(115200);
+}
+
+void loop()
+{
+		if(Serial.available())
+		{
+				if(Serial.read() == '1')
+				{
+			      delay(3000);
+			      Serial.print("Hello from Raspi");
+				}
+		}
+}
+```
+
+Ejecuta la aplicación en Unity. Verás un número cambiar rápidamente en pantalla. Ahora presiona la tecla A (no olvides dar click en la pantalla *Game*). ¿Qué pasa? ¿Por qué crees que ocurra esto?
+R\:
 
