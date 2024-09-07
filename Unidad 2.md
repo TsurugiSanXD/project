@@ -13,7 +13,8 @@ if(Serial.read() == '1'){
 }
 ```
 Prueba la aplicación con ScriptCommunicator. ¿Cómo funciona?
-R\: Basicamente lo que hace el codigo es que si se escribe por consola el número 1 va a parecer en la pantalla el mensaje "Hello from Raspberry Pi Pico"
+
+**R\:** Basicamente lo que hace el codigo es que si se escribe por consola el número 1 va a parecer en la pantalla el mensaje "Hello from Raspberry Pi Pico"
 
 Crea un nuevo C# Script y un Game Object. Añade el Script al GameObject. Ve al menu Assets y luego selecciona Open C# Project.
 
@@ -61,10 +62,12 @@ void Update()
 Analiza:
 
 - ¿Por qué es importante considerar las propiedades *PortName* y *BaudRate*?
-R\: Son importantes dado que PortName es la función que le da el nombre al puerto, en otras palabras es la función que le indica al programa que puerto es el que se va a usar.Por otro lado, BaudRate basicamente cumple la función de indicar la velocidad con la que se va a hacer la trsnamisión de datos
+  
+**R\:** Son importantes dado que PortName es la función que le da el nombre al puerto, en otras palabras es la función que le indica al programa que puerto es el que se va a usar.Por otro lado, BaudRate basicamente cumple la función de indicar la velocidad con la que se va a hacer la trsnamisión de datos
 
 - ¿Qué relación tienen las propiedades anteriores con el controlador?
-R\:Como se enciono anteriormente PortName sirve para indicar en que puesto se encuentra conectado el controlador y BaudRate es quien indica la velocidad quen tendra la transmisión de datos entre el controlador y el computador.
+
+**R\:**Como se enciono anteriormente PortName sirve para indicar en que puesto se encuentra conectado el controlador y BaudRate es quien indica la velocidad quen tendra la transmisión de datos entre el controlador y el computador.
 
 ## Ejercicio 2
 
@@ -138,7 +141,8 @@ void loop()
 ```
 
 Ejecuta la aplicación en Unity. Verás un número cambiar rápidamente en pantalla. Ahora presiona la tecla A (no olvides dar click en la pantalla *Game*). ¿Qué pasa? ¿Por qué crees que ocurra esto?
-R\: El codigo inicia un contador que va muy pero muy rapido y cuando oprimimos la letra A este suma un byte, cada vez que pulsemos A se agregara un byte.
+
+**R\:** El codigo inicia un contador que va muy pero muy rapido y cuando oprimimos la letra A este suma un byte, cada vez que pulsemos A se agregara un byte.
 
 Prueba con el siguiente código. Luego, **ANALIZA CON DETENIMIENTO.** Una vez más, no olvides cambiar el puerto serial.
 
