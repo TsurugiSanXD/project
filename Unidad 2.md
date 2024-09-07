@@ -353,4 +353,159 @@ Analicemos el asunto. Cuando preguntas `_serialPort.BytesToRead > 0` lo que 
 
 ## Ejercicio 4
 
+Ahora vas a analizar cómo puedes resolver el problema anterior. Puntualmente, analiza el siguiente programa del controlador:
+String btnState(uint8_t btnState)
+{
+		if(btnState == HIGH)
+		{
+				return "OFF";
+		}
+		else
+				return "ON";
+}
 
+void task()
+{
+		enum class TaskStates
+		{
+		    INIT,
+		    WAIT_COMMANDS
+	  };
+		static TaskStates taskState = TaskStates::INIT;
+		constexpr uint8_t led = 25;
+		constexpr uint8_t button1Pin = 12;
+		constexpr uint8_t button2Pin = 13;
+		constexpr uint8_t button3Pin = 32;
+		constexpr uint8_t button4Pin = 33;
+
+		switch (taskState)
+	  {
+				case TaskStates::INIT:
+				{
+						Serial.begin(115200);
+						pinMode(led, OUTPUT);
+						digitalWrite(led, LOW);
+						pinMode(button1Pin, INPUT_PULLUP);
+						pinMode(button2Pin, INPUT_PULLUP);
+						pinMode(button3Pin, INPUT_PULLUP);
+						pinMode(button4Pin, INPUT_PULLUP);
+						taskState = TaskStates::WAIT_COMMANDS;
+						break;
+				}
+				case TaskStates::WAIT_COMMANDS:
+				{
+						if (Serial.available() > 0)
+						{
+								String command = Serial.readStringUntil('\n');
+								if (command == "ledON")
+								{
+										digitalWrite(led, HIGH);
+								}
+								else if (command == "ledOFF")
+								{
+										digitalWrite(led, LOW);
+								}
+								else if (command == "readBUTTONS")
+							  {
+										Serial.print("btn1: ");
+						        Serial.print(btnState(digitalRead(button1Pin)).c_str());
+						        Serial.print(" btn2: ");
+						        Serial.print(btnState(digitalRead(button2Pin)).c_str());
+						        Serial.print(" btn3: ");
+						        Serial.print(btnState(digitalRead(button3Pin)).c_str());
+						        Serial.print(" btn4: ");
+						        Serial.print(btnState(digitalRead(button4Pin)).c_str());
+						        Serial.print('\n');
+					      }
+						}
+						break;
+				}
+				default:
+				{
+						break;
+			  }
+		}
+}
+
+void setup()
+{
+  task();
+}
+
+void loop()
+{
+  task();
+}
+​
+A continuación, analiza el siguiente programa del PC:
+using UnityEngine;
+using System.IO.Ports;
+using TMPro;
+
+enum TaskState
+{
+    INIT,
+    WAIT_COMMANDS
+}
+
+public classSerial : MonoBehaviour
+{
+		private static TaskState taskState = TaskState.INIT;
+		private SerialPort _serialPort;
+		private byte[] buffer;
+		public TextMeshProUGUI myText;
+		private int counter = 0;
+
+		void Start()
+    {
+				_serialPort =new SerialPort();
+        _serialPort.PortName = "COM3";
+        _serialPort.BaudRate = 115200;
+        _serialPort.DtrEnable =true;
+        _serialPort.NewLine = "\n";
+        _serialPort.Open();
+        Debug.Log("Open Serial Port");
+        buffer =new byte[128];
+    }
+
+		void Update()
+    {
+        myText.text = counter.ToString();
+        counter++;
+
+				switch (taskState)
+        {
+						case TaskState.INIT:
+		            taskState = TaskState.WAIT_COMMANDS;
+                Debug.Log("WAIT COMMANDS");
+								break;
+						case TaskState.WAIT_COMMANDS:
+								if (Input.GetKeyDown(KeyCode.A))
+                {
+		                _serialPort.Write("ledON\n");
+                    Debug.Log("Send ledON");
+                }
+								if (Input.GetKeyDown(KeyCode.S))
+                {
+                    _serialPort.Write("ledOFF\n");
+                    Debug.Log("Send ledOFF");
+                }
+								if (Input.GetKeyDown(KeyCode.R))
+                {
+                    _serialPort.Write("readBUTTONS\n");
+                    Debug.Log("Send readBUTTONS");
+                }
+								if (_serialPort.BytesToRead > 0)
+                {
+                    string response = _serialPort.ReadLine();
+                    Debug.Log(response);
+                }
+								break;
+						default:
+                Debug.Log("State Error");
+								break;
+        }
+    }
+}
+
+**R\:** El programa nos perimite configurar un led y cuatro botones, dpendiendo del boton que presionemos nos mostrara un estado diferente el cula se mostrara en el puerto serial. Con la tecla A manda un mensaje de que el led esta encendido, con la tecla S manda un mensaje que muestra que el led esta apagado y con la tecla R manda el mensaje de leer botones.
