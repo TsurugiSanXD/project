@@ -68,11 +68,57 @@ R\:Como se enciono anteriormente PortName sirve para indicar en que puesto se en
 
 ## Ejercicio 2
 
+Te invito a ver antes unos videos cortos con la explicación de este experimento usando unas herramientas un poco diferentes, sin embargo, el principio es el mismo.  Te dejo [este](https://youtube.com/playlist?list=PLX4ZVWZsOgzST9kfU9_ohOUYp_oDo2z48) link).
+
+Ahora realiza este experimento. Modifica la aplicación del PC así:
+
+```
+using UnityEngine;
+using System.IO.Ports;
+using TMPro;
+
+public class Serial : MonoBehaviour
+{
+	private SerialPort _serialPort =new SerialPort();
+	private byte[] buffer =new byte[32];
+
+	public TextMeshProUGUI myText;
+
+	private static int counter = 0;
+
+	void Start()
+    {
+        _serialPort.PortName = "COM3";
+        _serialPort.BaudRate = 115200;
+        _serialPort.DtrEnable =true;
+        _serialPort.Open();
+        Debug.Log("Open Serial Port");
+    }
+
+void Update()
+    {
+        myText.text = counter.ToString();
+        counter++;
+
+				if (Input.GetKeyDown(KeyCode.A))
+        {
+            byte[] data = {0x31};// or byte[] data = {'1'};            
+						_serialPort.Write(data,0,1);
+            int numData = _serialPort.Read(buffer, 0, 20);
+            Debug.Log(System.Text.Encoding.ASCII.GetString(buffer));
+            Debug.Log("Bytes received: " + numData.ToString());
+        }
+    }
+}
+```
+
+En tu sistema operativo debes averiguar en qué puerto está el controlador y cómo se llama. En Windows se usa COMx, donde x es el número del puerto serial asignado por el sistema operartivo a tu controlador.
+
 A continuación, debes adicionar a la aplicación un elemento de GUI tipo *Text - TextMeshPro* y luego, arrastrar una referencia a este elemento a *myText* (si no sabes cómo hacerlo llama al profe).
 
 Y la aplicación del controlador:
 
-```cpp
+```
 void setup()
 {
 		Serial.begin(115200);
@@ -92,5 +138,54 @@ void loop()
 ```
 
 Ejecuta la aplicación en Unity. Verás un número cambiar rápidamente en pantalla. Ahora presiona la tecla A (no olvides dar click en la pantalla *Game*). ¿Qué pasa? ¿Por qué crees que ocurra esto?
-R\:
+R\: El codigo inicia un contador que va muy pero muy rapido y cuando oprimimos la letra A este suma un byte, cada vez que pulsemos A se agregara un byte.
+
+Prueba con el siguiente código. Luego, **ANALIZA CON DETENIMIENTO.** Una vez más, no olvides cambiar el puerto serial.
+
+```csharp
+using UnityEngine;
+using System.IO.Ports;
+using TMPro;
+
+public class Serial : MonoBehaviour
+{
+		private SerialPort _serialPort =new SerialPort();
+		private byte[] buffer =new byte[32];
+
+		public TextMeshProUGUI myText;
+
+		private static int counter = 0;
+
+		void Start()
+		{
+		    _serialPort.PortName = "COM3";
+		    _serialPort.BaudRate = 115200;
+        _serialPort.DtrEnable =true;
+        _serialPort.Open();
+        Debug.Log("Open Serial Port");
+		}
+
+		void Update()
+		{
+        myText.text = counter.ToString();
+        counter++;
+
+				if (Input.GetKeyDown(KeyCode.A))
+				{
+            byte[] data = {0x31};// or byte[] data = {'1'};
+            _serialPort.Write(data,0,1);
+        }
+				if (_serialPort.BytesToRead > 0)
+			  {
+	          int numData = _serialPort.Read(buffer, 0, 20);
+            Debug.Log(System.Text.Encoding.ASCII.GetString(buffer));
+            Debug.Log("Bytes received: " + numData.ToString());
+        }
+		}
+
+```
+
+¿Funciona?
+Por ejemplo, ¿Qué pasaría si al momento de ejecutar la instrucción `int numData = 
+_serialPort.Read(buffer, 0, 20);` solo han llegado 10 de los 16 bytes del mensaje? ¿Cómo puede hacer tu programa para saber que ya tiene el mensaje completo? ¿Cómo se podría garantizar que antes de hacer la operación Read tenga los 16 bytes listos para ser leídos? Además, si los mensajes que envía el controlador tienen tamaños diferentes, ¿Cómo haces para saber que el mensaje enviado está completo o faltan bytes por recibir?
 
